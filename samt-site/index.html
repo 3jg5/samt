@@ -143,17 +143,18 @@ const cartN=()=>S.cart.reduce((a,i)=>a+i.qty,0);
 async function seed(){for(const s of SEED)await DB.put("products",{name:s[0],color:s[1],type:s[2],size:s[3],h:s[4],price:s[5],qty:1})}
 
 /* ===== العرض ===== */
-const social=()=>`<a href="https://instagram.com/${CONFIG.ig}" target="_blank">إنستقرام @${CONFIG.ig}</a> · <a href="https://wa.me/${CONFIG.wa}" target="_blank">واتساب +${CONFIG.wa}</a>`;
+const social=()=>`<a href="https://instagram.com/${CONFIG.ig}" target="_blank">إنستقرام @${CONFIG.ig}</a> · <a href="https://wa.me/${CONFIG.wa}" target="_blank">واتساب +${CONFIG.wa}</a> · <a href="https://maps.apple.com/place?address=Ruwi%20Street,%20Muscat,%20Muscat,%20Oman&coordinate=23.603900,58.536700&name=Ruwi%20Street&map=explore" target="_blank">موقع المتجر (شارع روي – مسقط)</a>`;
 const splash=()=>`<div class="splash"><div class="big">سَمت</div><div style="letter-spacing:8px">SAMT</div>
 <h1>أهلًا بك في سَمت</h1><p>حيث تُخاط الكُمّة العُمانية بيد أصيلة<br>خياطة يد · بنقشة ورسمة عُمانية · توصيل لجميع مناطق السلطنة</p>
 <a class="b g" href="#/shop">تصفّح الكُمم</a>
 <div class="row" style="flex:none"><a class="b o" href="#/login">تسجيل الدخول</a><a class="b o" href="#/register">إنشاء حساب</a></div>
-<div>${social()}</div></div>`;
+<div>${social()}</div>
+<div class="sm" style="color:var(--c);opacity:.85;margin-top:6px">المطور: <span dir="ltr">Ali Mohammed Al Rahma</span> · <a href="tel:+96898132390" dir="ltr">98132390</a></div></div>`;
 const head=()=>`<header><span class="logo" onclick="location.hash='#/'">سَمت</span><nav>
 <a class="b" href="#/shop">المتجر</a><a class="b" href="#/cart">السلة (${cartN()})</a>
 ${S.user?(S.user.admin?'<a class="b" href="#/admin">لوحة الإدارة</a>':'<a class="b" href="#/account">حسابي</a>')+'<button class="b" onclick="logout()">خروج</button>':'<a class="b" href="#/login">دخول</a>'}
 </nav></header>`;
-const foot=()=>`<footer>${social()}<br><span class="sm" style="color:var(--c)">يوجد توصيل لجميع مناطق السلطنة · <a href="#/admin-login">دخول الإدارة</a></span>${F?"":'<br><span class="tag">وضع تجريبي (بدون Firebase)</span>'}</footer>`;
+const foot=()=>`<footer>${social()}<br><span class="sm" style="color:var(--c)">يوجد توصيل لجميع مناطق السلطنة · <a href="#/admin-login">دخول الإدارة</a></span>${F?"":'<br><span class="tag">وضع تجريبي (بدون Firebase)</span>'}<br><span class="sm" style="color:var(--c);opacity:.85">المطور: <span dir="ltr">Ali Mohammed Al Rahma</span> · <a href="tel:+96898132390" dir="ltr">98132390</a></span></footer>`;
 
 async function render(){
   try{
