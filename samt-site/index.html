@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سَمت | الكُمّة العُمانية</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e0305">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="سَمت">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Reem+Kufi&display=swap" rel="stylesheet">
+<style>
+:root{--m:#2e0305;--c:#d9bfa0;--bg:#faf6f0;--ok:#3f6b3a;--bad:#b3261e}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tajawal,sans-serif;background:var(--bg);color:#1e1e1e}
+header{background:var(--m);color:var(--c);display:flex;align-items:center;gap:10px;padding:10px 16px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.logo{font-family:'Reem Kufi',serif;font-size:26px;cursor:pointer}
+nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
+header .b{background:transparent;color:var(--c)}
+button,input,select,textarea{font:inherit}
+.b{background:var(--m);color:var(--c);border:0;border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+.b.o{background:transparent;border:1px solid currentColor;color:var(--m)}
+.b.g{background:var(--c);color:var(--m)}.b.s{padding:3px 10px;font-size:13px}.b.r{background:var(--bad);color:#fff}.b.k{background:var(--ok);color:#fff}
+main{max-width:1000px;margin:auto;padding:16px;min-height:70vh}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+.card,.box{background:#fff;border-radius:14px;padding:12px;box-shadow:0 2px 8px #0001;margin-bottom:12px}
+.card .b{width:100%;margin-top:8px}
+.tile{height:110px;border-radius:50px 50px 8px 8px;background:var(--k);position:relative;margin-bottom:8px}
+.tile:after{content:"";position:absolute;inset:32% 8% 20%;border:2px dashed #fffc;border-radius:8px}
+.tile.im{background:var(--k) center/cover no-repeat;height:140px;border-radius:14px}.tile.im:after{display:none}
+.price{color:var(--m);font-weight:700}.sm{font-size:13px;color:#666}
+.tag{font-size:12px;padding:2px 8px;border-radius:20px;background:var(--c);color:var(--m)}
+label{display:block;margin:8px 0;font-size:14px}
+input,select,textarea{width:100%;padding:9px;border:1px solid #ccc;border-radius:8px;margin-top:3px;background:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs .b{flex:none}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px;border-bottom:1px solid #eee;text-align:start}
+.note{background:#fff3d6;border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:12px}
+.splash{min-height:100vh;background:radial-gradient(circle at 50% 30%,#4a0a0e,var(--m));color:var(--c);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:14px;animation:f 1.2s}
+.splash h1{margin:0;font-family:'Reem Kufi',serif}.big{font-family:'Reem Kufi',serif;font-size:80px;line-height:1}
+.splash a{color:var(--c)}.splash .b.g{color:var(--m)}.splash .b.o{color:var(--c)}
+@keyframes f{from{opacity:0;transform:translateY(14px)}}
+footer{text-align:center;padding:18px;background:var(--m);color:var(--c);font-size:14px}footer a{color:var(--c)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:10px;z-index:99}
+.st{padding:2px 8px;border-radius:8px;font-size:12px;background:#eee}
+@media print{header,footer,.np{display:none!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== الإعدادات ===== */
+const CONFIG={
+  firebase:null, // الصق هنا إعدادات Firebase: {apiKey:"..",authDomain:"..",projectId:"..",appId:".."}
+  adminEmail:"admin@samt.app",   // أنشئ هذا المستخدم في Firebase Authentication
+  demoAdminPass:"Samt9011",      // كلمة مرور المدير في الوضع التجريبي فقط
+  wa:"96890111340",              // رقم التواصل
+  invPhone:"96898132390",        // رقم استلام الفواتير (تجريبي)
+  ig:"samt_kumma",
+  delivery:0                     // رسوم التوصيل (ر.ع)
+};
+const SEED=[
+["قماش أخضر زيتوني بدائرة علوية","#6b7d2a","fabric",11.25,4,17],
+["قماش بيج بنقشة زهور ودائرة","#d8c08a","fabric",11.25,4,17],
+["قماش بيج بنقشة أوراق وزهور","#cdb27a","fabric",11.25,4,17],
+["كُمّة بنفسجية","#7a3d7a","ready",10.5,4.25,15],
+["كُمّة برتقالية عسلية","#b8731e","ready",11.25,4.25,15],
+["كُمّة رمادية بنية بزهور","#a3958a","ready",11,4,15],
+["كُمّة وردية","#f0b6d4","ready",10.75,4.25,15],
+["كُمّة خردلية بزهور","#c9a227","ready",10.75,4.25,15],
+["كُمّة رمادية بزهور كبيرة","#8f9694","ready",10.5,4.25,15],
+["كُمّة بيضاء","#ece6da","ready",11.25,4.25,15],
+["كُمّة رمادية بأوراق","#7d8584","ready",11.25,4,15],
+["كُمّة عنابية","#6e0f1f","ready",10.75,4,15],
+["كُمّة خضراء زيتونية","#6b7d2a","ready",11,4.25,15],
+["كُمّة صفراء ذهبية بمعينات","#d4a73a","ready",10.5,4.25,15]];
+const ST={pending:"قيد المراجعة",confirmed:"مؤكد",preparing:"جاري التجهيز",delivered:"تم التوصيل",cancelled:"ملغي"};
+
+/* ===== أدوات ===== */
+const $=s=>document.querySelector(s),v=id=>$("#"+id).value;
+const E=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const P=n=>Number(n).toFixed(3)+" ر.ع";
+const Z=n=>Math.floor(n)+({0:"",.25:" ¼",.5:" ½",.75:" ¾"}[n%1]||"");
+const LS={get:k=>{try{return JSON.parse(localStorage.getItem("samt_"+k))}catch(e){return null}},set:(k,x)=>{try{localStorage.setItem("samt_"+k,JSON.stringify(x))}catch(e){}}};
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),2600)}
+
+/* ===== طبقة البيانات: Firebase أو تجريبي (localStorage) ===== */
+let F=null;
+async function initDB(){
+  if(!CONFIG.firebase)return;
+  const b="https://www.gstatic.com/firebasejs/10.12.2/";
+  const [a,fs,au]=await Promise.all([import(b+"firebase-app.js"),import(b+"firebase-firestore.js"),import(b+"firebase-auth.js")]);
+  const app=a.initializeApp(CONFIG.firebase);
+  F={fs,au,db:fs.getFirestore(app),auth:au.getAuth(app)};
+  await F.auth.authStateReady();
+}
+const gid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const DB={
+  async list(c,uid){
+    if(F){const col=F.fs.collection(F.db,c);const q=uid?F.fs.query(col,F.fs.where("uid","==",uid)):col;
+      return (await F.fs.getDocs(q)).docs.map(d=>({...d.data(),id:d.id}))}
+    const l=LS.get(c)||[];return uid?l.filter(x=>x.uid==uid):l},
+  async put(c,o){
+    o.id=o.id||gid();
+    if(F){const {id,...r}=o;await F.fs.setDoc(F.fs.doc(F.db,c,id),JSON.parse(JSON.stringify(r)))}
+    else{const l=LS.get(c)||[],i=l.findIndex(x=>x.id==o.id);i<0?l.push(o):l[i]=o;LS.set(c,l)}
+    return o},
+  async del(c,id){
+    if(F)await F.fs.deleteDoc(F.fs.doc(F.db,c,id));
+    else LS.set(c,(LS.get(c)||[]).filter(x=>x.id!=id))}
+};
+const Auth={
+  async register(name,phone,pass){
+    if(!name||!/^[79]\d{7}$/.test(phone))throw Error("تحقق من الاسم ورقم الهاتف (8 أرقام يبدأ بـ 7 أو 9)");
+    if(pass.length<6)throw Error("كلمة المرور 6 أحرف على الأقل");
+    if(F){const r=await F.au.createUserWithEmailAndPassword(F.auth,phone+"@samt.app",pass);
+      await DB.put("users",{id:r.user.uid,name,phone});return{id:r.user.uid,name,phone}}
+    const us=LS.get("users")||[];
+    if(us.find(u=>u.phone==phone))throw Error("الرقم مسجل مسبقًا");
+    const u={id:"u"+gid(),name,phone,pass};us.push(u);LS.set("users",us);return{id:u.id,name,phone}},
+  async login(phone,pass,admin){
+    if(admin){
+      if(F){const r=await F.au.signInWithEmailAndPassword(F.auth,CONFIG.adminEmail,pass);return{id:r.user.uid,name:"المدير",admin:true}}
+      if(pass!=CONFIG.demoAdminPass)throw Error("كلمة المرور غير صحيحة");
+      return{id:"admin",name:"المدير",admin:true}}
+    if(F){const r=await F.au.signInWithEmailAndPassword(F.auth,phone+"@samt.app",pass);
+      const d=await F.fs.getDoc(F.fs.doc(F.db,"users",r.user.uid));
+      return{id:r.user.uid,name:d.exists()?d.data().name:"",phone}}
+    const u=(LS.get("users")||[]).find(x=>x.phone==phone&&x.pass==pass);
+    if(!u)throw Error("الهاتف أو كلمة المرور غير صحيحة");
+    return{id:u.id,name:u.name,phone}}
+};
+
+/* ===== الحالة ===== */
+let S={user:LS.get("session"),products:[],cart:LS.get("cart")||[],f:{},tab:"p",edit:null,filt:"all"};
+const saveCart=()=>LS.set("cart",S.cart);
+const cartN=()=>S.cart.reduce((a,i)=>a+i.qty,0);
+async function seed(){for(const s of SEED)await DB.put("products",{name:s[0],color:s[1],type:s[2],size:s[3],h:s[4],price:s[5],qty:1})}
+
+/* ===== العرض ===== */
+const social=()=>`<a href="https://instagram.com/${CONFIG.ig}" target="_blank">إنستقرام @${CONFIG.ig}</a> · <a href="https://wa.me/${CONFIG.wa}" target="_blank">واتساب +${CONFIG.wa}</a>`;
+const splash=()=>`<div class="splash"><div class="big">سَمت</div><div style="letter-spacing:8px">SAMT</div>
+<h1>أهلًا بك في سَمت</h1><p>حيث تُخاط الكُمّة العُمانية بيد أصيلة<br>خياطة يد · بنقشة ورسمة عُمانية · توصيل لجميع مناطق السلطنة</p>
+<a class="b g" href="#/shop">تصفّح الكُمم</a>
+<div class="row" style="flex:none"><a class="b o" href="#/login">تسجيل الدخول</a><a class="b o" href="#/register">إنشاء حساب</a></div>
+<div>${social()}</div></div>`;
+const head=()=>`<header><span class="logo" onclick="location.hash='#/'">سَمت</span><nav>
+<a class="b" href="#/shop">المتجر</a><a class="b" href="#/cart">السلة (${cartN()})</a>
+${S.user?(S.user.admin?'<a class="b" href="#/admin">لوحة الإدارة</a>':'<a class="b" href="#/account">حسابي</a>')+'<button class="b" onclick="logout()">خروج</button>':'<a class="b" href="#/login">دخول</a>'}
+</nav></header>`;
+const foot=()=>`<footer>${social()}<br><span class="sm" style="color:var(--c)">يوجد توصيل لجميع مناطق السلطنة · <a href="#/admin-login">دخول الإدارة</a></span>${F?"":'<br><span class="tag">وضع تجريبي (بدون Firebase)</span>'}</footer>`;
+
+async function render(){
+  try{
+    const r=location.hash.slice(1)||"/",app=$("#app");
+    if(r=="/"){app.innerHTML=splash();return}
+    S.products=await DB.list("products");
+    if(!S.products.length&&!F){await seed();S.products=await DB.list("products")}
+    const [p,a]=r.split("/").slice(1);
+    const m={shop,cart,account,admin,"login":()=>authForm(0),"register":()=>authForm(1),"admin-login":()=>authForm(2),inv:()=>inv(a)};
+    const html=await (m[p]||shop)();
+    app.innerHTML=head()+`<main>${html}</main>`+foot();
+  }catch(e){console.error(e);toast("حدث خطأ: "+(e.code||e.message))}
+}
+
+function shop(){
+  const l=S.products.filter(p=>S.filt=="all"||p.type==S.filt);
+  const fb=[["all","الكل"],["ready","كُمم جاهزة"],["fabric","قماش للخياطة"]].map(([k,t])=>`<button class="b ${S.filt==k?"":"o"}" onclick="S.filt='${k}';render()">${t}</button>`).join(" ");
+  return `<div class="note">لون الكُمّة قد يختلف عن الطبيعة بسبب التصوير والإضاءة · يوجد توصيل لجميع مناطق السلطنة</div>
+  <div class="tabs">${fb}</div><div class="grid">${l.map(p=>`<div class="card"><div class="tile ${p.img?"im":""}" style="--k:${E(p.color)};${p.img?`background-image:url('${E(p.img)}')`:""}"></div>
+  <b>${E(p.name)}</b><div class="sm">مقاس ${Z(p.size)} · ارتفاع ${Z(p.h)}</div>
+  <div class="price">${P(p.price)}</div><span class="tag">${p.qty>1?"متوفر":p.qty==1?"آخر قطعة":"نفد"}</span>
+  <button class="b" ${p.qty<1?"disabled":""} onclick="add('${p.id}')">أضف للسلة</button></div>`).join("")}</div>`;
+}
+function add(id){
+  const p=S.products.find(x=>x.id==id),i=S.cart.find(x=>x.pid==id);
+  if((i?i.qty:0)>=p.qty)return toast("لا توجد كمية إضافية");
+  i?i.qty++:S.cart.push({pid:id,qty:1});saveCart();toast("أُضيفت للسلة");render();
+}
+function chg(id,d){
+  const i=S.cart.find(x=>x.pid==id),p=S.products.find(x=>x.id==id);
+  i.qty=Math.min(p.qty,i.qty+d);if(i.qty<1)S.cart=S.cart.filter(x=>x!=i);saveCart();render();
+}
+const fi=(n,l,t="text")=>`<label>${l}<input id="f_${n}" type="${t}" value="${E(S.f[n]||"")}" oninput="S.f['${n}']=this.value"></label>`;
+function cart(){
+  S.cart=S.cart.filter(i=>S.products.find(p=>p.id==i.pid));
+  if(!S.cart.length)return `<div class="box">السلة فارغة. <a href="#/shop">تصفّح الكُمم</a></div>`;
+  const rows=S.cart.map(i=>{const p=S.products.find(x=>x.id==i.pid);return `<tr><td>${E(p.name)}<div class="sm">مقاس ${Z(p.size)}</div></td>
+  <td><button class="b s o" onclick="chg('${p.id}',-1)">−</button> ${i.qty} <button class="b s o" onclick="chg('${p.id}',1)">+</button></td><td>${P(p.price*i.qty)}</td></tr>`}).join("");
+  const sub=tot();
+  return `<div class="box"><table>${rows}<tr><td>رسوم التوصيل</td><td></td><td>${P(CONFIG.delivery)}</td></tr>
+  <tr><th>الإجمالي</th><td></td><th>${P(sub+CONFIG.delivery)}</th></tr></table></div>
+  ${S.user&&!S.user.admin?`<div class="box"><h3>بيانات التوصيل</h3>${fi("gov","المحافظة")}${fi("wil","الولاية")}${fi("adr","العنوان / وصف الموقع")}${fi("note","ملاحظات (اختياري)")}
+  <button class="b" onclick="sendOrder()">إرسال الطلب إلى الإدارة</button></div>`:`<div class="box">سجّل الدخول كعميل لإتمام الطلب. <a class="b" href="#/login">تسجيل الدخول</a></div>`}`;
+}
+const tot=()=>S.cart.reduce((a,i)=>a+i.qty*S.products.find(p=>p.id==i.pid).price,0);
+async function sendOrder(){
+  const f=S.f;if(!f.gov||!f.wil||!f.adr)return toast("أكمل بيانات التوصيل");
+  const ps=await DB.list("products"),items=[];
+  for(const i of S.cart){const p=ps.find(x=>x.id==i.pid);
+    if(!p||p.qty<i.qty)return toast("الكمية غير متاحة: "+(p?p.name:""));
+    items.push({pid:p.id,name:p.name,size:p.size,price:p.price,qty:i.qty})}
+  const sub=items.reduce((a,i)=>a+i.price*i.qty,0);
+  await DB.put("orders",{no:"SAMT-"+Date.now().toString(36).toUpperCase(),uid:S.user.id,name:S.user.name,phone:S.user.phone,
+    gov:f.gov,wil:f.wil,adr:f.adr,note:f.note||"",items,subtotal:sub,delivery:CONFIG.delivery,total:sub+CONFIG.delivery,status:"pending",date:new Date().toISOString()});
+  S.cart=[];saveCart();toast("تم إرسال طلبك إلى الإدارة");location.hash="#/account";
+}
+
+function authForm(m){
+  const t=["تسجيل الدخول","إنشاء حساب","دخول مدير الموقع"][m];
+  return `<div class="box" style="max-width:420px;margin:auto"><h2>${t}</h2>
+  ${m==1?'<label>الاسم الكامل<input id="nm"></label>':""}
+  ${m!=2?'<label>رقم الهاتف<input id="ph" type="tel" placeholder="9XXXXXXX"></label>':""}
+  <label>كلمة المرور<input id="pw" type="password"></label>
+  <button class="b" onclick="doAuth(${m})">${t}</button>
+  ${m==0?'<p class="sm">ليس لديك حساب؟ <a href="#/register">أنشئ حسابًا</a></p>':""}</div>`;
+}
+async function doAuth(m){
+  try{
+    const u=m==1?await Auth.register(v("nm").trim(),v("ph").trim(),v("pw")):await Auth.login(m==2?"":v("ph").trim(),v("pw"),m==2);
+    S.user=u;LS.set("session",u);location.hash=u.admin?"#/admin":"#/shop";
+  }catch(e){toast(e.code?"تحقق من البيانات وحاول مجددًا":e.message)}
+}
+function logout(){if(F)F.au.signOut(F.auth);S.user=null;LS.set("session",null);location.hash="#/"}
+
+const invs=()=>S.user.admin?DB.list("invoices"):DB.list("invoices",S.user.id);
+const byDate=(a,b)=>b.date.localeCompare(a.date);
+async function account(){
+  if(!S.user||S.user.admin)return `<div class="box">سجّل الدخول أولًا <a class="b" href="#/login">دخول</a></div>`;
+  const os=(await DB.list("orders",S.user.id)).sort(byDate),iv=await invs();
+  return `<h2>أهلًا ${E(S.user.name)}</h2>${os.length?os.map(o=>{const i=iv.find(x=>x.orderId==o.id);
+    return `<div class="box"><b>${o.no}</b> <span class="st">${ST[o.status]}</span> <span class="sm">${new Date(o.date).toLocaleDateString("ar-OM")}</span>
+    <div class="sm">${o.items.map(x=>E(x.name)+" ×"+x.qty).join("، ")}</div><b>${P(o.total)}</b>
+    ${i?`<a class="b s" href="#/inv/${i.id}">عرض الفاتورة</a>`:""}</div>`}).join(""):"<div class='box'>لا توجد طلبات بعد</div>"}`;
+}
+
+/* ===== الإدارة ===== */
+async function admin(){
+  if(!S.user?.admin){location.hash="#/admin-login";return ""}
+  const t=S.tab,tabs=`<div class="tabs">${[["p","الأصناف"],["o","الطلبات"],["i","الفواتير"]].map(([k,l])=>`<button class="b ${t==k?"":"o"}" onclick="S.tab='${k}';render()">${l}</button>`).join("")}</div>`;
+  if(t=="p"){
+    const e=S.products.find(x=>x.id==S.edit)||{name:"",color:"#6b7d2a",type:"ready",size:11,h:4,price:15,qty:1};
+    return tabs+`<div class="box"><h3>${S.edit?"تعديل صنف":"إضافة صنف"}</h3>
+    <div class="row"><label>الاسم<input id="fn" value="${E(e.name)}"></label><label>اللون<input id="fc" type="color" value="${E(e.color)}"></label>
+    <label>النوع<select id="ft"><option value="ready" ${e.type=="ready"?"selected":""}>كُمّة جاهزة</option><option value="fabric" ${e.type=="fabric"?"selected":""}>قماش</option></select></label></div>
+    <div class="row"><label>المقاس<input id="fs" type="number" step="0.25" value="${e.size}"></label><label>الارتفاع<input id="fh" type="number" step="0.25" value="${e.h}"></label>
+    <label>السعر (ر.ع)<input id="fp" type="number" step="0.5" value="${e.price}"></label><label>الكمية<input id="fq" type="number" value="${e.qty}"></label></div>
+    <label>صورة الكُمّة<input id="fimg" type="file" accept="image/*" onchange="pickImg(this)"></label><div id="pv">${(S.img||e.img)?`<img src="${E(S.img||e.img)}" style="height:90px;border-radius:8px">`:""}</div><button class="b" onclick="saveProd()">حفظ</button> ${S.edit?'<button class="b o" onclick="S.edit=null;render()">إلغاء</button>':""}
+    ${!S.products.length?'<button class="b g" onclick="seed().then(render)">استيراد الأصناف الأولية</button>':""}</div>
+    <div class="box" style="overflow:auto"><table><tr><th>الصنف</th><th>المقاس</th><th>السعر</th><th>الكمية</th><th></th></tr>
+    ${S.products.map(p=>`<tr><td>${E(p.name)}</td><td>${Z(p.size)}/${Z(p.h)}</td><td>${P(p.price)}</td>
+    <td><button class="b s o" onclick="qtyAdj('${p.id}',-1)">−</button> ${p.qty} <button class="b s o" onclick="qtyAdj('${p.id}',1)">+</button></td>
+    <td><button class="b s" onclick="S.edit='${p.id}';S.img=null;render();scrollTo(0,0)">تعديل</button> <button class="b s r" onclick="delProd('${p.id}')">حذف</button></td></tr>`).join("")}</table></div>`;
+  }
+  if(t=="o"){
+    const os=(await DB.list("orders")).sort(byDate),B=(id,s,l,c="")=>`<button class="b s ${c}" onclick="setSt('${id}','${s}')">${l}</button> `;
+    return tabs+(os.length?os.map(o=>`<div class="box"><b>${o.no}</b> <span class="st">${ST[o.status]}</span> <span class="sm">${new Date(o.date).toLocaleString("ar-OM")}</span>
+    <div>${E(o.name)} · ${E(o.phone)}</div><div class="sm">${E(o.gov)} - ${E(o.wil)} - ${E(o.adr)} ${o.note?"· "+E(o.note):""}</div>
+    <div>${o.items.map(x=>E(x.name)+" ×"+x.qty).join("، ")}</div><b>${P(o.total)}</b><div style="margin-top:8px">
+    ${o.status=="pending"?B(o.id,"confirmed","تأكيد وإصدار فاتورة","k"):""}${o.status=="confirmed"?B(o.id,"preparing","جاري التجهيز"):""}${o.status=="preparing"?B(o.id,"delivered","تم التوصيل","k"):""}
+    ${["pending","confirmed","preparing"].includes(o.status)?B(o.id,"cancelled","إلغاء / رفض","r"):""}</div></div>`).join(""):"<div class='box'>لا توجد طلبات</div>");
+  }
+  const iv=(await invs()).sort(byDate);
+  return tabs+`<div class="box"><table><tr><th>الفاتورة</th><th>العميل</th><th>الإجمالي</th><th>الإرسال</th><th></th></tr>${iv.map(i=>`<tr><td>${i.no}</td><td>${E(i.order.name)}</td><td>${P(i.order.total)}</td><td>${i.sent?"تم":i.sendStatus=="failed"?"فشل":F&&i.queue?"قيد الإرسال":"لم يُرسل"}</td><td><a class="b s" href="#/inv/${i.id}">عرض</a></td></tr>`).join("")}</table></div>`;
+}
+function pickImg(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);S.img=c.toDataURL("image/jpeg",.72);$("#pv").innerHTML=`<img src="${S.img}" style="height:90px;border-radius:8px">`};im.src=r.result};r.readAsDataURL(f)}
+async function saveProd(){
+  const o={id:S.edit||undefined,name:v("fn").trim(),color:v("fc"),type:v("ft"),size:+v("fs"),h:+v("fh"),price:+v("fp"),qty:Math.max(0,parseInt(v("fq"))||0)};const old=S.products.find(x=>x.id==S.edit),im=S.img||(old&&old.img);if(im)o.img=im;
+  if(!o.name||!(o.price>=0))return toast("أكمل البيانات");
+  await DB.put("products",o);S.edit=null;S.img=null;toast("تم الحفظ");render();
+}
+async function qtyAdj(id,d){const p=S.products.find(x=>x.id==id);p.qty=Math.max(0,p.qty+d);await DB.put("products",p);render()}
+async function delProd(id){if(confirm("حذف الصنف؟")){await DB.del("products",id);render()}}
+async function setSt(id,st){
+  const o=(await DB.list("orders")).find(x=>x.id==id),ps=await DB.list("products");
+  if(st=="confirmed"){
+    for(const i of o.items){const p=ps.find(x=>x.id==i.pid);if(!p||p.qty<i.qty)return toast("الكمية غير كافية: "+i.name)}
+    for(const i of o.items){const p=ps.find(x=>x.id==i.pid);p.qty-=i.qty;await DB.put("products",p)}
+    o.status=st;await DB.put("orders",o);
+    const iv=await DB.put("invoices",{no:"INV-"+Date.now().toString(36).toUpperCase(),orderId:o.id,uid:o.uid,date:new Date().toISOString(),order:o,sent:false,queue:!!F});
+    toast("تم التأكيد وحفظ الفاتورة");location.hash="#/inv/"+iv.id;return;
+  }
+  if(st=="cancelled"&&["confirmed","preparing"].includes(o.status))
+    for(const i of o.items){const p=ps.find(x=>x.id==i.pid);if(p){p.qty+=i.qty;await DB.put("products",p)}}
+  o.status=st;await DB.put("orders",o);render();
+}
+
+/* ===== الفاتورة ===== */
+async function inv(id){
+  if(!S.user)return `<div class="box">سجّل الدخول أولًا <a class="b" href="#/login">دخول</a></div>`;
+  const i=(await invs()).find(x=>x.id==id);if(!i)return "<div class='box'>الفاتورة غير موجودة</div>";
+  const o=i.order;
+  return `<div class="np row" style="margin-bottom:10px"><button class="b" onclick="print()">طباعة / حفظ PDF</button>
+  ${S.user.admin?(F?`<button class="b k" onclick="autoSend('${i.id}')">إرسال تلقائي ${i.sent?"(أُرسلت ✓)":i.sendStatus=="failed"?"(فشل، أعد المحاولة)":""}</button> `:"")+`<button class="b o" onclick="sendInv('${i.id}','app')">فتح تطبيق واتساب</button> <button class="b o" onclick="sendInv('${i.id}','web')">واتساب ويب</button> <button class="b o" onclick="sendInv('${i.id}','api')">رابط بديل</button> <button class="b o" onclick="sendInv('${i.id}','copy')">نسخ نص الفاتورة</button>`:""}</div>
+  <div class="box"><div style="text-align:center"><div class="big" style="font-size:48px;color:var(--m)">سَمت</div>
+  <div class="sm">SAMT · @${CONFIG.ig} · +${CONFIG.wa}</div></div>
+  <h3>فاتورة رقم ${i.no}</h3><div class="sm">طلب ${o.no} · ${new Date(i.date).toLocaleDateString("ar-OM")}</div>
+  <p>العميل: <b>${E(o.name)}</b> · ${E(o.phone)}<br>العنوان: ${E(o.gov)} - ${E(o.wil)} - ${E(o.adr)}</p>
+  <table><tr><th>الصنف</th><th>المقاس</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>
+  ${o.items.map(x=>`<tr><td>${E(x.name)}</td><td>${Z(x.size)}</td><td>${x.qty}</td><td>${P(x.price)}</td><td>${P(x.price*x.qty)}</td></tr>`).join("")}
+  <tr><td colspan="4">رسوم التوصيل</td><td>${P(o.delivery)}</td></tr><tr><th colspan="4">الإجمالي</th><th>${P(o.total)}</th></tr></table>
+  <p class="sm">لون الكُمّة قد يختلف عن الطبيعة بسبب التصوير والإضاءة. شكرًا لثقتكم بسَمت.</p></div>`;
+}
+async function autoSend(id){const i=(await invs()).find(x=>x.id==id);i.queue=true;i.sendStatus="";await DB.put("invoices",i);toast("أُضيفت للإرسال، تتحدث الحالة خلال ثوانٍ");setTimeout(render,5000)}
+async function sendInv(id,mode){
+  const i=(await invs()).find(x=>x.id==id),o=i.order;
+  const txt=`فاتورة سَمت ${i.no}\nالعميل: ${o.name} (${o.phone})\n`+o.items.map(x=>`- ${x.name} ×${x.qty} = ${P(x.price*x.qty)}`).join("\n")+`\nالإجمالي: ${P(o.total)}\nالتوصيل إلى: ${o.gov} - ${o.wil}`;
+  try{await navigator.clipboard.writeText(txt)}catch(e){}
+  if(mode=="copy")return toast("تم نسخ نص الفاتورة، الصقه في محادثة واتساب");
+  const q=encodeURIComponent(txt),ph=CONFIG.invPhone;
+  if(mode=="app")location.href=`whatsapp://send?phone=${ph}&text=${q}`;
+  else window.open(mode=="web"?`https://web.whatsapp.com/send?phone=${ph}&text=${q}`:`https://api.whatsapp.com/send?phone=${ph}&text=${q}`,"_blank");
+  i.sent=true;i.sentAt=new Date().toISOString();await DB.put("invoices",i);toast("تم حفظ حالة الإرسال");
+}
+
+(async()=>{
+  try{await initDB()}catch(e){console.error(e);F=null;alert("تعذّر الاتصال بـ Firebase، سيعمل الموقع بالوضع التجريبي")}
+  addEventListener("hashchange",render);render();
+})();
+</script>
+</body>
+</html>
